@@ -1,0 +1,40 @@
+1. Usar una imagen base de Python slim para mantener el contenedor ligero
+2. Establecer variables de entorno.
+   Estas variables de entorno configuran el entorno de Airflow:
+   AIRFLOW_HOME establece el directorio principal de Airflow.
+   AIRFLOW__CORE__LOAD_EXAMPLES desactiva la carga de ejemplos predeterminados.
+   AIRFLOW__DATABASE__SQL_ALCHEMY_CONN configura la conexión a la base de datos, usando SQLite en este caso.
+3. Instalar dependencias del sistema.
+   Se actualizan los repositorios de paquetes y se instalan las dependencias necesarias para compilar y ejecutar Airflow. Luego, se limpian    los archivos temporales para reducir el tamaño de la imagen.
+4. Instalar Apache Airflow.
+   Se copia un archivo requirements.txt al contenedor.
+   Se actualiza pip a la última versión.
+   Se instala Apache Airflow usando pip.
+   Se instalan las dependencias adicionales listadas en requirements.txt.
+5. Crear el directorio de Airflow
+6. Copiar el DAG al directorio de Airflow
+7. Copiar el script de inicio (entrypoint.sh) al conteneder y se le dan permisos
+9. Comando para ejecutar el script de inicio (entrypoint.sh)
+
+ENTRYPOINT.SH
+El script entrypoint.sh realiza las siguientes tareas:
+Inicializa la base de datos de Airflow.
+Crea un usuario administrador (si no existe ya).
+Arranca el scheduler de Airflow en segundo plano.
+Inicia el servidor web de Airflow en el puerto 8081.
+
+DAG (my_dag.py)
+Este DAG está diseñado para ejecutar diariamente una tarea que consulta una API meteorológica, procesa los datos obtenidos, y luego inserta estos datos en una tabla de una base de datos Redshift. A continuación, se explica cada parte del código en detalle:
+1. Se importan los módulos necesarios para manejar fechas (datetime, timedelta), la definición de DAGs y operadores en Airflow (DAG,    PythonOperator), y para trabajar con solicitudes HTTP (requests), datos en formato de tabla (pandas), conexiones a bases de datos    (psycopg2) y variables de entorno (os).
+2. Función para consultar la API
+   Esta función realiza una solicitud GET a la URL de la API proporcionada y devuelve los datos en formato JSON si la solicitud es exitosa.    En caso de error, imprime el código de error o el mensaje de excepción.
+3. Función principal de la tarea
+   Esta función realiza los siguientes pasos:
+   - Consulta la API meteorológica y procesa los datos obtenidos.
+   - Normaliza los datos JSON en un DataFrame de pandas.
+   - Se conecta a una base de datos Redshift utilizando credenciales almacenadas en variables de entorno.
+   - Crea una tabla en Redshift si no existe ya.
+   - Inserta los datos del DataFrame en la tabla.
+   - Cierra la conexión a la base de datos.
+4. Definición del DAG
+5. Definición de la tarea

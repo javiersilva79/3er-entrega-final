@@ -1,0 +1,6 @@
+pendulum==2.1.2
+flask-session
+sqlalchemy<2.0
+requests
+pandas
+psycopg2-binary
